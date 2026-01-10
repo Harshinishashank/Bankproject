@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from .models import User
+from django.contrib.auth.hashers import make_password
+from .models import User
 
 # Create your views here.
 
@@ -16,6 +18,10 @@ def account_opening(request):
         # You would typically save the user data to the database here
         print(f"Account created for username: {username}")
 
+        # 1. Manually hash the password
+        # This turns '12345' into 'pbkdf2_sha256$600000$random_hash...'
+        hashed_password = make_password(password)
+
         if User.objects.filter(username=username).exists():
             print("Username already exists.")
             return render(request, 'users/error.html')
@@ -23,7 +29,7 @@ def account_opening(request):
         #writing to database
         user = User.objects.create_user(
             username=username,
-            password=password,
+            password=hashed_password,
             first_name=fname,
             last_name=lname,
             email=email,
