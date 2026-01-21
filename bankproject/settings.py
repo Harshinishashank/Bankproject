@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'bankproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bank_project',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'Paneer@2025',
-        'HOST': 'localhost',
+        'PASSWORD': 'test123456',
+        'HOST': 'database-1.cxkem6osoya0.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
