@@ -6,17 +6,18 @@ pipeline {
         DB_NAME = "bankdb"
         DB_USER = "postgres"
         DB_PASSWORD = "Test1234"
-    }
 
-    stages {
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                ~/venv/bin/pip install -r requirements.txt
-                '''
-            }
-        }
+      stage('Install Dependencies') {
+          steps {
+              sh '''
+                 python3 -m venv venv
+                 ./venv/bin/pip install --upgrade pip
+                 ./venv/bin/pip install -r requirements.txt
+               '''
+          }
+      }
+
 
         stage('Test RDS Connection') {
             steps {
