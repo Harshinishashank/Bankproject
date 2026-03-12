@@ -10,12 +10,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Harshinishashank/Bankproject.git'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -41,7 +35,7 @@ pipeline {
             steps {
                 sh '''
                 source ~/venv/bin/activate
-                python app.py
+                python manage.py runserver 0.0.0.0:8000
                 '''
             }
         }
