@@ -13,8 +13,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                source ~/venv/bin/activate
-                pip install -r requirements.txt
+                ~/venv/bin/pip install -r requirements.txt
                 '''
             }
         }
@@ -34,8 +33,7 @@ pipeline {
         stage('Run Application') {
             steps {
                 sh '''
-                source ~/venv/bin/activate
-                python manage.py runserver 0.0.0.0:8000
+                ~/venv/bin/python manage.py runserver 0.0.0.0:8000
                 '''
             }
         }
