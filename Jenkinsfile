@@ -10,15 +10,19 @@ pipeline {
 
     stages { // <-- This starts the container for ALL stages
         
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    python3 -m venv venv
-                    ./venv/bin/pip install --upgrade pip
-                    ./venv/bin/pip install -r requirements.txt
-                '''
-            }
-        }
+    stage('Install Dependencies') {
+    steps {
+        sh '''
+        # Check if venv exists; if not, create it
+        if [ ! -d "venv" ]; then
+            python3 -m venv venv
+        fi
+        . venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        '''
+    }
+}
 
         stage('Test RDS Connection') {
             steps {
