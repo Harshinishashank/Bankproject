@@ -6,7 +6,7 @@ pipeline {
         DB_HOST = "database-2.cxkem6osoya0.us-east-2.rds.amazonaws.com"
         DB_NAME = "bankdb"
         DB_USER = "postgres"
-        DB_PASSWORD = "Test123"
+        DB_PASSWORD = "Test1234"
         IMAGE_NAME = "bankproject:latest"
         CONTAINER_NAME = "bank-app"
     }
