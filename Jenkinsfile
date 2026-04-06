@@ -33,18 +33,20 @@ pipeline {
             }
         }
 
-        // STEP 3: Run the Application (This is the fix!)
-        stage('Run Application') {
-            steps {
-                echo "Deploying the container..."
-                // 1. Remove the old container if it exists so we don't get a name conflict
-                // 2. Run the new one in the background (-d)
-                sh """
-                docker rm -f ${CONTAINER_NAME} || true
-                docker run -d -p 8000:8000 --name ${CONTAINER_NAME} ${IMAGE_NAME}
-                """
-                echo "Application is running in the background. Build complete!"
-            }
-        }
-    }
-}
+    stage('Run Application') {
+    steps {
+        echo "Deploying the container..."
+        sh """
+        # 1. Force remove the old container (-f handles running or stopped)
+        docker rm -f ${CONTAINER_NAME} || true
+        
+        # 2. Run with the restart policy and port mapping
+        docker run -d \
+            -p 8000:8000 \
+            --restart always \
+            --name ${CONTAINER_NAME} \
+            ${IMAGE_NAME}
+        """
+        echo "Application is running with auto-restart enabled. Build complete!"
+       }
+   }
