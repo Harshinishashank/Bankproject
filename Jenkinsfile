@@ -6,7 +6,6 @@ pipeline {
         DB_HOST = "database-2.cxkem6osoya0.us-east-2.rds.amazonaws.com"
         DB_NAME = "bankdb"
         DB_USER = "postgres"
-        DB_PASSWORD = "Test1234"
         IMAGE_NAME = "bankproject:latest"
         CONTAINER_NAME = "bank-app"
     }
@@ -20,16 +19,18 @@ pipeline {
             }
         }
 
-        // STEP 2: Verify the RDS connection (Still useful!)
+        // STEP 2: Verify the RDS connection (Secure Version)
         stage('Test RDS Connection') {
             steps {
-                sh '''
-                    PGPASSWORD=$DB_PASSWORD psql \
-                    -h $DB_HOST \
-                    -U $DB_USER \
-                    -d $DB_NAME \
-                    -c "SELECT 1;" 
-                '''
+                withCredentials([string(credentialsId: 'RDS_DB_PASSWORD', variable: 'DB_PASSWORD')]) {
+                    sh '''
+                        PGPASSWORD=$DB_PASSWORD psql \
+                        -h $DB_HOST \
+                        -U $DB_USER \
+                        -d $DB_NAME \
+                        -c "SELECT 1;" 
+                    '''
+                }
             }
         }
 
