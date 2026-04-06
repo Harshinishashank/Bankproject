@@ -6,7 +6,6 @@ pipeline {
         DB_HOST = "database-2.cxkem6osoya0.us-east-2.rds.amazonaws.com"
         DB_NAME = "bankdb"
         DB_USER = "postgres"
-        DB_PASSWORD = "Test123"
         IMAGE_NAME = "bankproject:latest"
         CONTAINER_NAME = "bank-app"
     }
@@ -20,31 +19,30 @@ pipeline {
             }
         }
 
-        // STEP 2: Verify the RDS connection (Still useful!)
+        // STEP 2: Verify the RDS connection (Secure Version)
         stage('Test RDS Connection') {
             steps {
-                sh '''
-                    PGPASSWORD=$DB_PASSWORD psql \
-                    -h $DB_HOST \
-                    -U $DB_USER \
-                    -d $DB_NAME \
-                    -c "SELECT 1;" 
-                '''
+                withCredentials([string(credentialsId: 'RDS_DB_PASSWORD', variable: 'DB_PASSWORD')]) {
+                    sh '''
+                        PGPASSWORD=$DB_PASSWORD psql \
+                        -h $DB_HOST \
+                        -U $DB_USER \
+                        -d $DB_NAME \
+                        -c "SELECT 1;" 
+                    '''
+                }
             }
         }
 
-        // STEP 3: Run the Application (This is the fix!)
-        stage('Run Application') {
+    stage('Run Application') {
             steps {
                 echo "Deploying the container..."
-                // 1. Remove the old container if it exists so we don't get a name conflict
-                // 2. Run the new one in the background (-d)
                 sh """
                 docker rm -f ${CONTAINER_NAME} || true
-                docker run -d -p 8000:8000 --name ${CONTAINER_NAME} ${IMAGE_NAME}
+                docker run -d -p 8000:8000 --restart always --name ${CONTAINER_NAME} ${IMAGE_NAME}
                 """
-                echo "Application is running in the background. Build complete!"
-            }
-        }
-    }
-}
+                echo "Application is running with auto-restart enabled. Build complete!"
+            } // Closes steps
+        } // Closes stage
+    } // Closes stages
+} // Closes pipeline
