@@ -1,81 +1,50 @@
-🏦 Bankproject: End-to-End CI/CD Pipeline
-This project demonstrates a full DevOps lifecycle: from local development to a containerized deployment on AWS EC2, integrated with an AWS RDS PostgreSQL database via Jenkins.
+# 🏦 BankProject - CI/CD & Cloud Infrastructure
 
-🏗 Architecture Overview
-Local Development: Code is pushed to GitHub.
+A full-stack banking application deployed on **AWS EC2** using a modern DevOps pipeline. This project demonstrates automated deployment, reverse proxy configuration, and real-time system monitoring.
 
-CI/CD (Jenkins): Jenkins triggers a build, pulls the code, and builds a Docker image.
+## 🏗️ Architecture Overview
+* **Cloud Provider:** AWS (EC2 t3.micro)
+* **Database:** AWS RDS (PostgreSQL)
+* **Containerization:** Docker
+* **Web Server:** Nginx (Reverse Proxy)
+* **CI/CD Pipeline:** Jenkins (GitHub Webhooks)
+* **Monitoring:** Netdata
 
-Security (Vault): Database credentials are securely pulled from Jenkins Credentials.
+---
 
-Database (RDS): Jenkins verifies connectivity to the PostgreSQL instance.
+## 🚀 Deployment Pipeline
+The project utilizes a **Jenkinsfile** pipeline that automates the following stages:
+1.  **Build:** Generates a Docker image from the source code.
+2.  **Test:** Verifies connectivity to the AWS RDS instance.
+3.  **Deploy:** * Removes existing containers to prevent conflicts.
+    * Deploys the new container with resource limits (`--memory=512m`, `--cpus=0.5`).
+    * Ensures high availability with `--restart always`.
 
-Deployment (Docker): The old container is replaced by a new one with a restart: always policy.
+---
 
-🚀 Deployment Workflow
-1. AWS Infrastructure Setup
-EC2 Instance: Ubuntu 24.04 LTS, t2.micro.
+## 🌐 Web Server & Security
+The application is served via **Nginx** acting as a reverse proxy.
+* **Public Access:** Port 80 (HTTP)
+* **Internal Routing:** Nginx forwards traffic to the Docker container on port 8000.
+* **Security:** Public access to port 8000 is blocked at the AWS Security Group level, forcing all traffic through the Nginx layer for better security.
 
-Security Group: Ports 22 (SSH), 8080 (Jenkins), and 8000 (App) open to My IP.
+---
 
-RDS Database: PostgreSQL 17.
+## 📊 Monitoring
+Real-time infrastructure and container health are tracked via **Netdata**.
+* **URL:** `http://<EC2-IP>:19999`
+* **Metrics:** CPU utilization, RAM usage, and per-container statistics for the `bank-app`.
 
-Security Group: Port 5432 open only to the EC2 Security Group ID.
+---
 
-2. Jenkins Configuration
-Credentials: Added Secret Text with ID RDS_DB_PASSWORD.
-
-Tools Installed: Docker, Java 17, Jenkins, and postgresql-client.
-
-💻 Essential Commands
-☁️ Connecting to Infrastructure
-Bash
-# Connect to EC2
-ssh -i bank-key.pem ubuntu@<EC2_IP>
-
-# Check if the app is running
-docker ps
-
-# Check the Auto-Restart policy
-docker inspect bank-app | grep RestartPolicy -A 3
-🗄️ Database Management (Direct Access)
-To verify your bank data manually from the EC2 terminal:
-
-Bash
-# Connect to the project database
-PGPASSWORD=$DB_PASSWORD psql -h <RDS_ENDPOINT> -U postgres -d bankdb
-
-# Useful SQL Commands:
-\dt                  # List all tables
-SELECT * FROM users;  # View customer data
-\q                   # Exit PostgreSQL
-🛠 Jenkins Pipeline (The "Engine")
-The Jenkinsfile automates the following stages:
-
-Build: docker build -t bankproject:latest .
-
-Security Check: Verifies RDS connection using withCredentials.
-
-Deploy:
-
-Stops old container: docker rm -f bank-app || true
-
-Starts new container: docker run -d -p 8000:8000 --restart always --name bank-app bankproject:latest
-
-🔒 Security Best Practices Implemented
-✅ No Hardcoded Passwords: Used Jenkins Secret Text for RDS credentials.
-
-✅ Security Group Isolation: RDS is not public; it only accepts traffic from the EC2.
-
-✅ Auto-Healing: Docker containers are set to restart: always to survive server reboots.
-
-# Bank Application Project(local on docker hub)
-
-This is a Django-based bank application containerized using Docker for consistent deployment across environments.
-
-## 🚀 Quick Start (Running via Docker Hub)
-If you have Docker installed, you don't even need to download the source code. Simply run:
+## 🛠️ Local Setup & Commands
+To run this application locally using Docker:
 
 ```bash
-docker run -d -p 8000:8000 --name running-bank-app harshinishashank/bank-app:v1
-Last Updated: Mon Apr  6 20:31:04 UTC 2026
+# Build the image
+docker build -t bankproject .
+
+# Run the container
+docker run -d -p 8000:8000 --name bank-app bankproject
+
+
