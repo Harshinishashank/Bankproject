@@ -1,50 +1,59 @@
 # 🏦 BankProject - CI/CD & Cloud Infrastructure
 
-A full-stack banking application deployed on **AWS EC2** using a modern DevOps pipeline. This project demonstrates automated deployment, reverse proxy configuration, and real-time system monitoring.
+A full-stack banking application deployed on **AWS EC2** using a professional DevOps pipeline. This project showcases automated container deployment, cloud database management, and infrastructure monitoring.
 
 ## 🏗️ Architecture Overview
-* **Cloud Provider:** AWS (EC2 t3.micro)
-* **Database:** AWS RDS (PostgreSQL)
-* **Containerization:** Docker
-* **Web Server:** Nginx (Reverse Proxy)
-* **CI/CD Pipeline:** Jenkins (GitHub Webhooks)
-* **Monitoring:** Netdata
+* **Cloud Provider:** AWS (EC2 t3.micro & RDS PostgreSQL)
+* **Containerization:** Docker (App, Monitoring, & Image Management)
+* **Web Server:** Nginx acting as a Reverse Proxy
+* **CI/CD Pipeline:** Jenkins with GitHub Webhooks
+* **Monitoring:** Netdata (Real-time resource tracking)
+
+---
+
+## 📸 Project Documentation
+> **Note:** The following screenshots document the live, healthy infrastructure deployed in April 2026.
+
+### **1. Cloud Infrastructure (AWS)**
+Management of scalable compute resources and managed database services.
+| EC2 Instance (Jenkins/App) | RDS Database (PostgreSQL) |
+| :--- | :--- |
+| ![EC2 Instance](EC2%20instance-Bankproject.jpg) | ![RDS Database](RDS-Bankproject.jpg) |
+
+### **2. Automated CI/CD Pipeline (Jenkins)**
+Every code push triggers an automated build, test, and deployment flow.
+![Jenkins Pipeline Stages](Jenkins-build-images.png)
+
+### **3. Artifact & Infrastructure Validation**
+Validation of the successfully built Docker image and enforced container resource limits.
+| Docker Image Build | Resource Governance (CLI) |
+| :--- | :--- |
+| ![Docker Image](Netdata-monitoring-Bankproject.png) | ![Docker Limits](Netdata-monitoring-CPU%20resource%20imit.png) |
+
+### **4. Live Application**
+The banking interface served securely via Nginx.
+![Live BankProject App](Bankproject-live.png)
 
 ---
 
 ## 🚀 Deployment Pipeline
-The project utilizes a **Jenkinsfile** pipeline that automates the following stages:
-1.  **Build:** Generates a Docker image from the source code.
-2.  **Test:** Verifies connectivity to the AWS RDS instance.
-3.  **Deploy:** * Removes existing containers to prevent conflicts.
-    * Deploys the new container with resource limits (`--memory=512m`, `--cpus=0.5`).
-    * Ensures high availability with `--restart always`.
+The project utilizes a **Jenkinsfile** that automates the lifecycle:
+1.  **Build:** Packages the Python application into a Docker image.
+2.  **Test:** Verifies connectivity between the container and AWS RDS.
+3.  **Deploy:** Performs a rolling update, removes stale containers, and enforces resource limits (`--memory=512m`) for stability.
 
 ---
 
-## 🌐 Web Server & Security
-The application is served via **Nginx** acting as a reverse proxy.
-* **Public Access:** Port 80 (HTTP)
-* **Internal Routing:** Nginx forwards traffic to the Docker container on port 8000.
-* **Security:** Public access to port 8000 is blocked at the AWS Security Group level, forcing all traffic through the Nginx layer for better security.
+## 🌐 Security & Networking
+* **Reverse Proxy:** Nginx redirects traffic from Port 80 to the internal Docker port 8000.
+* **Security Groups:** Port 8000 is restricted; only Port 80 (Web) and Port 19999 (Monitoring) are accessible to the public.
 
 ---
 
-## 📊 Monitoring
-Real-time infrastructure and container health are tracked via **Netdata**.
-* **URL:** `http://<EC2-IP>:19999`
-* **Metrics:** CPU utilization, RAM usage, and per-container statistics for the `bank-app`.
-
----
-
-## 🛠️ Local Setup & Commands
-To run this application locally using Docker:
-
+## 🛠️ Local Setup
+To run a local copy of this container:
 ```bash
-# Build the image
 docker build -t bankproject .
-
-# Run the container
 docker run -d -p 8000:8000 --name bank-app bankproject
 
 
